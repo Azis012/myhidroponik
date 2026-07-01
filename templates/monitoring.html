@@ -1,0 +1,450 @@
+{% extends 'base.html' %}
+{% block extra_css %}
+<style>
+    .breadcrumb {
+        background: transparent;
+        padding: 0.5rem 0;
+        margin-bottom: 1.5rem;
+    }
+    .breadcrumb-item a {
+        color: #40916c;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .breadcrumb-item.active {
+        color: #1b4332;
+        font-weight: 600;
+    }
+    .status-card {
+        border-radius: 1.25rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border: none;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .status-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(40, 145, 108, 0.1);
+    }
+    .card-icon-bg {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+    }
+    .bg-ph-light { background: rgba(13, 99, 228, 0.1); color: #0d63e4; }
+    .bg-tds-light { background: rgba(25, 135, 84, 0.1); color: #198754; }
+    .bg-temp-light { background: rgba(253, 126, 20, 0.1); color: #fd7e14; }
+    
+    .chart-container {
+        position: relative;
+        height: 250px;
+        width: 100%;
+    }
+    .table-container {
+        background: #ffffff;
+        border-radius: 1.25rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+    .deepsleep-panel {
+        background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
+        color: #ffffff;
+        border-radius: 1.25rem;
+        box-shadow: 0 4px 15px rgba(27, 67, 50, 0.15);
+    }
+    .form-select-custom {
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 0.75rem;
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        font-weight: 600;
+        padding: 0.6rem 1rem;
+        outline: none;
+        transition: all 0.2s;
+    }
+    .form-select-custom:focus {
+        border-color: #52b788;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        box-shadow: 0 0 0 0.25rem rgba(82, 183, 136, 0.25);
+    }
+    .form-select-custom option {
+        background-color: #1b4332;
+        color: #ffffff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Navigation -->
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'daftar_kebun' %}"><i class="fas fa-home me-1"></i> Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'daftar_tanaman' rak.tanaman.kebun.id %}">{{ rak.tanaman.kebun.nama }}</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'daftar_rak' rak.tanaman.id %}">{{ rak.tanaman.nama }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ rak.nama_rak }} (Grafik)</li>
+  </ol>
+</nav>
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
+    <div>
+        <h3 class="fw-bold text-dark-green mb-1"><i class="fas fa-chart-line text-success me-2"></i>Grafik & Monitoring Real-Time</h3>
+        <p class="text-muted mb-0">Memantau parameter sensor terkini pada <strong>{{ rak.nama_rak }}</strong></p>
+    </div>
+    
+    <!-- Deep Sleep Quick Controller -->
+    <div class="deepsleep-badge d-flex align-items-center bg-white border p-2 px-3 rounded-pill shadow-sm">
+        <i class="fas fa-moon text-success me-2"></i>
+        <span class="small text-muted me-2 font-semibold">Mode Tidur ESP32:</span>
+        {% csrf_token %}
+        <select class="form-select form-select-sm deepsleep-select border-0 bg-transparent p-0 font-semibold text-success" data-rak-id="{{ rak.id }}" style="width: 75px; outline: none; cursor: pointer; font-size: 0.9rem;">
+            <option value="5" {% if rak.deepsleep_menit == 5 %}selected{% endif %}>5 Menit</option>
+            <option value="10" {% if rak.deepsleep_menit == 10 %}selected{% endif %}>10 Menit</option>
+            <option value="15" {% if rak.deepsleep_menit == 15 %}selected{% endif %}>15 Menit</option>
+            <option value="30" {% if rak.deepsleep_menit == 30 %}selected{% endif %}>30 Menit</option>
+            <option value="60" {% if rak.deepsleep_menit == 60 %}selected{% endif %}>1 Jam</option>
+        </select>
+    </div>
+</div>
+
+<!-- Latest Status Metrics -->
+{% with latest_data=data_logs.0 %}
+<div class="row mb-5 g-3">
+    <!-- pH Card -->
+    <div class="col-md-4">
+        <div class="card status-card">
+            <div class="card-body d-flex align-items-center p-4">
+                <div class="card-icon-bg bg-ph-light me-3">
+                    <i class="fas fa-tint"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-1 small fw-bold uppercase">Derajat Keasaman (pH)</h6>
+                    <h3 class="fw-bold mb-0">{% if latest_data %}{{ latest_data.ph|floatformat:1 }}{% else %}--{% endif %}</h3>
+                    <small class="text-muted">
+                        {% if latest_data %}
+                            {% if latest_data.ph < rak.min_ph %}
+                                <span class="text-danger"><i class="fas fa-arrow-down me-1"></i>Terlalu Asam (<{{ rak.min_ph }})</span>
+                            {% elif latest_data.ph > rak.max_ph %}
+                                <span class="text-danger"><i class="fas fa-arrow-up me-1"></i>Terlalu Basa (>{{ rak.max_ph }})</span>
+                            {% else %}
+                                <span class="text-success"><i class="fas fa-check-circle me-1"></i>Kondisi Ideal ({{ rak.min_ph }} - {{ rak.max_ph }})</span>
+                            {% endif %}
+                        {% else %}
+                            Belum ada data
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- TDS Card -->
+    <div class="col-md-4">
+        <div class="card status-card">
+            <div class="card-body d-flex align-items-center p-4">
+                <div class="card-icon-bg bg-tds-light me-3">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-1 small fw-bold uppercase">Kepekatan Nutrisi (TDS)</h6>
+                    <h3 class="fw-bold mb-0">{% if latest_data %}{{ latest_data.tds|floatformat:0 }} <span class="fs-6 fw-normal text-muted">PPM</span>{% else %}--{% endif %}</h3>
+                    <small class="text-muted">
+                        {% if latest_data %}
+                            {% if latest_data.tds < 800 %}
+                                <span class="text-warning"><i class="fas fa-arrow-down me-1"></i>Nutrisi Kurang (<800)</span>
+                            {% elif latest_data.tds > 1200 %}
+                                <span class="text-warning"><i class="fas fa-arrow-up me-1"></i>Nutrisi Tinggi (>1200)</span>
+                            {% else %}
+                                <span class="text-success"><i class="fas fa-check-circle me-1"></i>Kondisi Ideal (800-1200)</span>
+                            {% endif %}
+                        {% else %}
+                            Belum ada data
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Temperature Card -->
+    <div class="col-md-4">
+        <div class="card status-card">
+            <div class="card-body d-flex align-items-center p-4">
+                <div class="card-icon-bg bg-temp-light me-3">
+                    <i class="fas fa-thermometer-half"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-1 small fw-bold uppercase">Suhu Air Nutrisi</h6>
+                    <h3 class="fw-bold mb-0">{% if latest_data %}{{ latest_data.suhu|floatformat:1 }} <span class="fs-6 fw-normal text-muted">°C</span>{% else %}--{% endif %}</h3>
+                    <small class="text-muted">
+                        {% if latest_data %}
+                            {% if latest_data.suhu < 20 %}
+                                <span class="text-warning"><i class="fas fa-snowflake me-1"></i>Terlalu Dingin (<20°C)</span>
+                            {% elif latest_data.suhu > 28 %}
+                                <span class="text-danger"><i class="fas fa-fire me-1"></i>Terlalu Panas (>28°C)</span>
+                            {% else %}
+                                <span class="text-success"><i class="fas fa-check-circle me-1"></i>Kondisi Ideal (20-25°C)</span>
+                            {% endif %}
+                        {% else %}
+                            Belum ada data
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endwith %}
+
+<!-- Charts Grid -->
+<div class="row mb-5 g-4">
+    <!-- pH Chart -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold text-dark-green mb-0"><i class="fas fa-tint text-primary me-2"></i>Tren pH Air</h5>
+                <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1" style="background: rgba(13, 99, 228, 0.1);">{{ rak.min_ph }} - {{ rak.max_ph }}</span>
+            </div>
+            <div class="card-body p-4">
+                <div class="chart-container">
+                    <canvas id="phChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- TDS Chart -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold text-dark-green mb-0"><i class="fas fa-bolt text-success me-2"></i>Tren TDS (PPM)</h5>
+                <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1" style="background: rgba(25, 135, 84, 0.1);">800 - 1200</span>
+            </div>
+            <div class="card-body p-4">
+                <div class="chart-container">
+                    <canvas id="tdsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Temperature Chart -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold text-dark-green mb-0"><i class="fas fa-thermometer-half text-warning me-2"></i>Tren Suhu (°C)</h5>
+                <span class="badge bg-warning-subtle text-warning rounded-pill px-2.5 py-1" style="background: rgba(253, 126, 20, 0.1);">20 - 25°C</span>
+            </div>
+            <div class="card-body p-4">
+                <div class="chart-container">
+                    <canvas id="tempChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- History Logs Table -->
+<div class="table-container mb-5">
+    <div class="p-4 border-bottom border-light d-flex justify-content-between align-items-center bg-light">
+        <h5 class="fw-bold text-dark-green mb-0"><i class="fas fa-history me-2 text-secondary"></i>Log Data Sensor Terakhir</h5>
+        <span class="badge bg-secondary rounded-pill px-3 py-1.5 fw-semibold">Menampilkan 20 Data Terakhir</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light text-muted uppercase font-semibold" style="font-size: 0.85rem;">
+                <tr>
+                    <th class="ps-4 py-3">No</th>
+                    <th class="py-3">Waktu Penerimaan</th>
+                    <th class="py-3">pH Air</th>
+                    <th class="py-3">TDS (PPM)</th>
+                    <th class="py-3">Suhu Air</th>
+                    <th class="py-3 pe-4 text-center">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in data_logs %}
+                <tr>
+                    <td class="ps-4 fw-semibold">{{ forloop.counter }}</td>
+                    <td><i class="far fa-clock text-muted me-2"></i>{{ log.timestamp|date:"d M Y, H:i" }}</td>
+                    <td class="fw-bold text-primary">{{ log.ph|floatformat:1 }}</td>
+                    <td class="fw-bold text-success">{{ log.tds|floatformat:0 }}</td>
+                    <td class="fw-bold text-warning">{{ log.suhu|floatformat:1 }} °C</td>
+                    <td class="pe-4 text-center">
+                        {% if log.ph >= 5.5 and log.ph <= 6.5 and log.tds >= 800 and log.tds <= 1200 and log.suhu >= 20 and log.suhu <= 25 %}
+                            <span class="badge bg-success-subtle text-success px-3 py-1.5 rounded-pill" style="font-size: 0.75rem; background: rgba(25, 135, 84, 0.1);">Normal</span>
+                        {% else %}
+                            <span class="badge bg-warning-subtle text-warning px-3 py-1.5 rounded-pill" style="font-size: 0.75rem; background: rgba(253, 126, 20, 0.1);">Perlu Cek</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <i class="fas fa-database mb-3 opacity-30" style="font-size: 2.5rem;"></i>
+                        <p class="mb-0">Belum ada data sensor masuk dari ESP32.</p>
+                        <small>Pastikan alat ESP32 menyala dan terhubung ke topik <strong>hydroponik/tanamanku/datasensor/{{ rak.api_key.api_key }}</strong></small>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Chart.js and Graph Logic -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Extract logs data from Django template contexts
+    const rawData = [
+        {% for log in data_logs %}
+        {
+            time: '{{ log.timestamp|date:"H:i" }}',
+            ph: {{ log.ph|default:0 }},
+            tds: {{ log.tds|default:0 }},
+            suhu: {{ log.suhu|default:0 }}
+        },
+        {% endfor %}
+    ];
+    
+    // Reverse array to render oldest to newest (left to right)
+    const chartData = rawData.reverse();
+    const labels = chartData.map(item => item.time);
+    
+    // Common configurations
+    const getChartOptions = (yMin, yMax, stepSize) => ({
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: { font: { family: 'Outfit', size: 11 } }
+            },
+            y: {
+                grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                ticks: { font: { family: 'Outfit', size: 11 } }
+            }
+        }
+    });
+
+    // 1. pH Chart
+    const ctxPh = document.getElementById('phChart').getContext('2d');
+    new Chart(ctxPh, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: chartData.map(item => item.ph),
+                borderColor: '#0d63e4',
+                backgroundColor: 'rgba(13, 99, 228, 0.05)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#0d63e4',
+                pointRadius: 3
+            }]
+        },
+        options: getChartOptions(0, 14, 2)
+    });
+
+    // 2. TDS Chart
+    const ctxTds = document.getElementById('tdsChart').getContext('2d');
+    new Chart(ctxTds, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: chartData.map(item => item.tds),
+                borderColor: '#198754',
+                backgroundColor: 'rgba(25, 135, 84, 0.05)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#198754',
+                pointRadius: 3
+            }]
+        },
+        options: getChartOptions(0, 2000, 200)
+    });
+
+    // 3. Temperature Chart
+    const ctxTemp = document.getElementById('tempChart').getContext('2d');
+    new Chart(ctxTemp, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: chartData.map(item => item.suhu),
+                borderColor: '#fd7e14',
+                backgroundColor: 'rgba(253, 126, 20, 0.05)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#fd7e14',
+                pointRadius: 3
+            }]
+        },
+        options: getChartOptions(0, 50, 5)
+    });
+
+    // Handle Deep Sleep Selector Changes via AJAX
+    document.querySelectorAll('.deepsleep-select').forEach(select => {
+        let previousValue = select.value;
+        
+        select.addEventListener('focus', function() {
+            previousValue = this.value;
+        });
+
+        select.addEventListener('change', function(e) {
+            const rakId = this.dataset.rakId;
+            const minutes = this.value;
+            
+            fetch(`/rak/${rakId}/deepsleep/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                },
+                body: `menit=${minutes}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Show floating success toast
+                    const toast = document.createElement('div');
+                    toast.className = 'alert alert-success alert-dismissible fade show shadow';
+                    toast.style.position = 'fixed';
+                    toast.style.bottom = '20px';
+                    toast.style.right = '20px';
+                    toast.style.zIndex = '9999';
+                    toast.style.borderRadius = '0.75rem';
+                    toast.innerHTML = `
+                        <i class="fas fa-check-circle me-2"></i> ${data.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" style="padding: 1rem 1rem 1rem 0.5rem;"></button>
+                    `;
+                    document.body.appendChild(toast);
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        setTimeout(() => toast.remove(), 500);
+                    }, 3000);
+                    previousValue = minutes;
+                } else {
+                    alert('Gagal memperbarui Deep Sleep: ' + data.message);
+                    this.value = previousValue;
+                }
+            })
+            .catch(error => {
+                alert('Error updating deep sleep: ' + error);
+                this.value = previousValue;
+            });
+        });
+    });
+</script>
+{% endblock %}

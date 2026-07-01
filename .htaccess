@@ -1,0 +1,37 @@
+# ----------------------------------------------------------------------
+# Web Performance Optimization - Apache/LiteSpeed Caching Directives
+# ----------------------------------------------------------------------
+
+# Enable Expires Headers (Browser Caching)
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Default cache expiration: 1 month
+    ExpiresDefault "access plus 1 month"
+    
+    # CSS and Javascript: 1 month
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+    
+    # Media and Images (Fast loading & responsive optimization): 1 year
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+    
+    # Fonts
+    ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+# Force long-term caching for static assets
+<IfModule mod_headers.c>
+    <FilesMatch "\.(webp|svg|png|jpe?g|gif|ico|css|js|woff2?|ttf)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>

@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    .store-banner {
+        background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
+        border-radius: 1.25rem;
+        padding: 3rem;
+        color: #ffffff;
+        margin-bottom: 3rem;
+        box-shadow: 0 10px 30px rgba(45, 106, 79, 0.15);
+        position: relative;
+        overflow: hidden;
+    }
+    .store-banner-icon {
+        position: absolute;
+        right: -20px;
+        bottom: -40px;
+        font-size: 11rem;
+        color: rgba(255, 255, 255, 0.08);
+        transform: rotate(15deg);
+        pointer-events: none;
+    }
+    .product-card {
+        border: none;
+        border-radius: 1.25rem;
+        background: #ffffff;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.03);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        overflow: hidden;
+    }
+    .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(27, 67, 50, 0.12);
+    }
+    .product-img-box {
+        height: 220px;
+        overflow: hidden;
+        position: relative;
+    }
+    .product-img-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+    .product-card:hover .product-img-box img {
+        transform: scale(1.05);
+    }
+    .product-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: #40916c;
+        color: #ffffff;
+        padding: 0.35rem 0.85rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    .product-info {
+        padding: 1.75rem;
+    }
+    .product-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2d6a4f;
+        margin: 0.75rem 0 1.25rem 0;
+    }
+    .feature-list {
+        list-style-type: none;
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+    .feature-list li {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    .feature-list li i {
+        color: #40916c;
+        margin-right: 0.5rem;
+        font-size: 0.95rem;
+    }
+    .banner-badge {
+        background: #ffffff !important;
+        color: #1b4332 !important;
+        font-weight: 700 !important;
+        letter-spacing: 1.2px;
+        font-size: 0.75rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="store-banner">
+    <div class="position-relative z-index-2" style="max-width: 600px;">
+        <span class="badge banner-badge px-3 py-2 rounded-pill mb-3">STORE</span>
+        <h1 class="fw-bold mb-2">Smart Hydro Detector Kit 🔌</h1>
+        <p class="lead mb-0 opacity-80" style="font-size: 1.05rem;">
+            Dapatkan sensor kit deteksi otomatis terkalibrasi yang siap dihubungkan langsung dengan website ini secara instan via Wi-Fi.
+        </p>
+    </div>
+    <i class="fas fa-microchip store-banner-icon"></i>
+</div>
+
+<div class="row g-4">
+    <!-- Product 1 -->
+    <div class="col-12 col-md-4">
+        <div class="product-card">
+            <div>
+                <div class="product-img-box">
+                    <img src="/media/store_banners/solo.png" alt="Smart Hydro IoT Kit (Solo)">
+                    <span class="product-badge">BASIC DEVICE</span>
+                </div>
+                <div class="product-info">
+                    <h5 class="fw-bold text-dark-green mb-1">Smart Hydro IoT Kit (Solo)</h5>
+                    <p class="text-muted small">Satu unit perangkat detector lengkap dengan sensor pH, TDS, dan Suhu siap pakai.</p>
+                    <div class="product-price">Rp 750.000</div>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> 1x Modul ESP32 Wi-Fi Dual-Core</li>
+                        <li><i class="fas fa-check-circle"></i> 1x Sensor Analog pH Probe</li>
+                        <li><i class="fas fa-check-circle"></i> 1x Sensor TDS Meter (Kepekatan Nutrisi)</li>
+                        <li><i class="fas fa-check-circle"></i> 1x Sensor Suhu DS18B20 Waterproof</li>
+                        <li><i class="fas fa-check-circle"></i> Box Enclosure Tahan Cipratan Air</li>
+                        <li><i class="fas fa-check-circle"></i> Akses Alarm Notifikasi WhatsApp</li>
+                        <li class="fw-bold text-success"><i class="fas fa-gift"></i> BONUS: Free 1 Bulan Konsultasi Ahli</li>
+                        <li class="fw-bold text-success"><i class="fas fa-gift"></i> BONUS: Kalibrasi Powder Kit</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="p-4 pt-0">
+                <a href="https://wa.me/628123456789?text=Halo%20Smart%20Hidroponik,%20saya%20ingin%20membeli%20paket%20Smart%20Hydro%20IoT%20Kit%20(Solo)%20seharga%20Rp%20750.000" target="_blank" class="btn btn-success w-100 py-2.5 font-semibold">
+                    <i class="fab fa-whatsapp me-2"></i> Beli Sekarang via WA
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Product 2 -->
+    <div class="col-12 col-md-4">
+        <div class="product-card" style="border: 2px solid #52b788; box-shadow: 0 10px 25px rgba(82, 183, 136, 0.15);">
+            <div>
+                <div class="product-img-box">
+                    <img src="/media/store_banners/bundle.png" alt="Smart Hydro Multi-Rack (5 Unit)">
+                    <span class="product-badge" style="background: #2d6a4f;">COMMERCIAL PACKAGE</span>
+                </div>
+                <div class="product-info">
+                    <h5 class="fw-bold text-dark-green mb-1">Smart Hydro Multi-Rack (5 Unit)</h5>
+                    <p class="text-muted small">Paket hemat 5 unit alat detector lengkap untuk memantau 5 rak atau tangki sekaligus.</p>
+                    <div class="product-price">Rp 3.250.000</div>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> 5x Unit Perangkat Smart Hydro IoT Kit Lengkap</li>
+                        <li><i class="fas fa-check-circle"></i> Pemantauan Terpusat pada 1 Akun Dashboard</li>
+                        <li><i class="fas fa-check-circle"></i> Notifikasi Alarm WhatsApp untuk 5 Alat</li>
+                        <li><i class="fas fa-check-circle"></i> Casing Waterproof Outdoor Robust</li>
+                        <li class="fw-bold text-success"><i class="fas fa-gift"></i> BONUS: Free Lifetime Konsultasi Hydro AI</li>
+                        <li class="fw-bold text-success"><i class="fas fa-gift"></i> BONUS: Diskon 15% (Hemat Rp 500.000)</li>
+                        <li class="fw-bold text-success"><i class="fas fa-gift"></i> BONUS: Cairan Kalibrasi pH Lengkap</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="p-4 pt-0">
+                <a href="https://wa.me/628123456789?text=Halo%20Smart%20Hidroponik,%20saya%20ingin%20membeli%20paket%20Smart%20Hydro%20Multi-Rack%20(5%20Unit)%20seharga%20Rp%203.250.000" target="_blank" class="btn btn-success w-100 py-2.5 font-semibold" style="background: linear-gradient(135deg, #52b788 0%, #2d6a4f 100%);">
+                    <i class="fab fa-whatsapp me-2"></i> Beli Sekarang via WA
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Product 3 -->
+    <div class="col-12 col-md-4">
+        <div class="product-card">
+            <div>
+                <div class="product-img-box">
+                    <img src="/media/store_banners/tower.png" alt="Smart Hydro NFT Tower System">
+                    <span class="product-badge bg-secondary">ALL-IN-ONE SYSTEM</span>
+                </div>
+                <div class="product-info">
+                    <h5 class="fw-bold text-dark-green mb-1">Smart Hydro NFT Tower System</h5>
+                    <p class="text-muted small">Paket super lengkap fisik NFT Tower (36 Lubang) + 1 unit Smart Hydro IoT Kit.</p>
+                    <div class="product-price">Rp 4.950.000</div>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> 1x Unit Fisik Vertical NFT Tower (36 Lubang)</li>
+                        <li><i class="fas fa-check-circle"></i> 1x Pompa Air Hidroponik & Tangki Nutrisi</li>
+                        <li><i class="fas fa-check-circle"></i> 1x Unit Smart Hydro IoT Detector Kit</li>
+                        <li><i class="fas fa-check-circle"></i> Pupuk AB Mix Premium + Paket Bibit Unggul</li>
+                        <li class="fw-bold text-success"><i class="fas fa-gift"></i> BONUS: Free Lifetime Asisten Hydro AI</li>
+                        <li class="fw-bold text-success"><i class="fas fa-gift"></i> BONUS: Free 3 Bulan Privat Agronomis</li>
+                        <li class="fw-bold text-success"><i class="fas fa-gift"></i> BONUS: Garansi Alat 1 Tahun</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="p-4 pt-0">
+                <a href="https://wa.me/628123456789?text=Halo%20Smart%20Hidroponik,%20saya%20ingin%20membeli%20Smart%20Hydro%20NFT%20Tower%20System%20seharga%20Rp%204.950.000" target="_blank" class="btn btn-success w-100 py-2.5 font-semibold">
+                    <i class="fab fa-whatsapp me-2"></i> Beli Sekarang via WA
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

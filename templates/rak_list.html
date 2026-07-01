@@ -1,0 +1,462 @@
+{% extends 'base.html' %}
+{% block extra_css %}
+<style>
+    .breadcrumb {
+        background: transparent;
+        padding: 0.5rem 0;
+        margin-bottom: 1.5rem;
+    }
+    .breadcrumb-item a {
+        color: #40916c;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .breadcrumb-item.active {
+        color: #1b4332;
+        font-weight: 600;
+    }
+    
+    .rak-card {
+        position: relative;
+        overflow: visible; /* to allow absolute dropdown label overlapping */
+    }
+    .rak-img-container {
+        width: 100%;
+        height: 160px;
+        background: #f4f7f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+    .rak-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .api-key-box {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        padding: 0.6rem 0.8rem;
+        border-radius: 0.75rem;
+        font-family: monospace;
+        font-size: 0.825rem;
+        color: #495057;
+        word-break: break-all;
+        margin-bottom: 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .sensor-grid {
+        background: rgba(40, 145, 108, 0.04);
+        border: 1px solid rgba(40, 145, 108, 0.08);
+        border-radius: 0.85rem;
+        padding: 1rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .sensor-item {
+        text-align: center;
+    }
+    .sensor-val {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-top: 0.25rem;
+    }
+    .val-ph { color: #0d63e4; }
+    .val-tds { color: #198754; }
+    .val-temp { color: #fd7e14; }
+    
+    .deepsleep-badge {
+        background: #ffffff;
+        border: 1.5px solid #d8f3dc;
+        border-radius: 0.75rem;
+        padding: 0.35rem 0.6rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+    }
+    
+    .btn-delete-rak {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        z-index: 10;
+    }
+    .btn-delete-rak:hover {
+        background: #dc3545;
+        color: #ffffff;
+    }
+    
+    .btn-add-rak {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        min-height: 260px;
+        border: none;
+        background: transparent;
+        color: #2d6a4f;
+        transition: all 0.2s;
+    }
+    .btn-add-rak i {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+        background: rgba(40, 145, 108, 0.1);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+    }
+    .btn-add-rak:hover i {
+        transform: scale(1.1);
+        background: #2d6a4f;
+        color: #ffffff;
+    }
+    
+    /* Modern form control styles */
+    .form-control-custom {
+        border: 2px solid #d8f3dc;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s;
+    }
+    .form-control-custom:focus {
+        border-color: #52b788;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(82, 183, 136, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Navigation -->
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'daftar_kebun' %}"><i class="fas fa-home me-1"></i> Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'daftar_tanaman' kebun.id %}">{{ kebun.nama }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ tanaman.nama }}</li>
+  </ol>
+</nav>
+
+{% if messages %}
+<div class="row mb-3">
+    <div class="col-12">
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" role="alert">
+                <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-dark-green"><i class="fas fa-layer-group text-success me-2"></i>Daftar Rak untuk Tanaman {{ tanaman.nama }}</h3>
+</div>
+
+<div class="row">
+    {% for r in raks %}
+    <div class="col-6 col-sm-6 col-lg-4 mb-4">
+        <div class="card shadow-sm card-hover border-0 rak-card h-100">
+            <!-- Sleek absolute delete button -->
+            <a href="{% url 'hapus' 'rak' r.id %}" class="btn-delete-rak" onclick="return confirm('Apakah Anda yakin ingin menghapus rak {{ r.nama_rak }}?')" title="Hapus Rak">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+
+            <!-- Card Image Box -->
+            <div class="p-3 pb-0">
+                <div class="rak-img-container">
+                    {% if r.foto %}
+                        <img src="{{ r.foto.url }}" class="rak-img" alt="{{ r.nama_rak }}">
+                    {% else %}
+                        <div class="text-center">
+                            <i class="fas fa-image text-muted opacity-50" style="font-size: 3rem;"></i>
+                            <div class="small text-muted mt-2">Belum ada foto</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card-body d-flex flex-column justify-content-between pt-2 px-2 px-md-4 pb-3 pb-md-4">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="fw-bold text-dark-green mb-0">{{ r.nama_rak }}</h5>
+                        <!-- Deep Sleep Mode Selector (Enabled!) -->
+                        <div class="deepsleep-badge d-flex align-items-center">
+                            <i class="fas fa-moon text-success me-1 small"></i>
+                            <select class="form-select form-select-sm deepsleep-select border-0 bg-transparent p-0 font-semibold" data-rak-id="{{ r.id }}" style="width: 75px; font-size: 0.8rem; outline: none; cursor: pointer; color: #1b4332;">
+                                <option value="5" {% if r.deepsleep_menit == 5 %}selected{% endif %}>5m</option>
+                                <option value="10" {% if r.deepsleep_menit == 10 %}selected{% endif %}>10m</option>
+                                <option value="15" {% if r.deepsleep_menit == 15 %}selected{% endif %}>15m</option>
+                                <option value="30" {% if r.deepsleep_menit == 30 %}selected{% endif %}>30m</option>
+                                <option value="60" {% if r.deepsleep_menit == 60 %}selected{% endif %}>1j</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-2 opacity-50">
+                    
+                    <small class="text-muted d-block mb-1">API Key (ESP32):</small>
+                    <div class="api-key-box">
+                        <span class="text-truncate" id="key-{{ r.id }}">{{ r.api_key.api_key }}</span>
+                        <button class="btn btn-sm btn-link p-0 text-success ms-2" onclick="navigator.clipboard.writeText('{{ r.api_key.api_key }}'); alert('API Key disalin!')" title="Salin API Key">
+                            <i class="far fa-copy"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Data Sensor Terbaru -->
+                    {% with latest_data=r.data_sensor.first %}
+                    {% if latest_data %}
+                    <div class="sensor-grid">
+                        <div class="row g-1">
+                            <div class="col-4 sensor-item border-end border-light">
+                                <small class="text-muted" style="font-size: 0.75rem;"><i class="fas fa-tint me-1 text-primary"></i>pH</small>
+                                <div class="sensor-val val-ph">{{ latest_data.ph|floatformat:1 }}</div>
+                            </div>
+                            <div class="col-4 sensor-item border-end border-light">
+                                <small class="text-muted" style="font-size: 0.75rem;"><i class="fas fa-bolt me-1 text-success"></i>TDS</small>
+                                <div class="sensor-val val-tds">{{ latest_data.tds|floatformat:0 }}</div>
+                            </div>
+                            <div class="col-4 sensor-item">
+                                <small class="text-muted" style="font-size: 0.75rem;"><i class="fas fa-thermometer-half me-1 text-warning"></i>Suhu</small>
+                                <div class="sensor-val val-temp">{{ latest_data.suhu|floatformat:1 }}°</div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-2">
+                            <small class="text-muted" style="font-size: 0.725rem;"><i class="far fa-clock me-1"></i>Update: {{ latest_data.timestamp|date:"d M Y, H:i" }}</small>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="bg-light p-3 rounded mb-3 text-center text-muted border border-light">
+                        <i class="fas fa-satellite-dish fa-spin text-success mb-2" style="font-size: 1.25rem;"></i><br>
+                        <small class="small d-block">Menunggu sinyal data dari ESP32...</small>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    
+                    <p class="small text-muted mb-2"><i class="fab fa-whatsapp text-success me-1"></i> WhatsApp: <strong>{{ r.nomor_wa }}</strong></p>
+                    
+                    <div class="d-flex justify-content-between text-muted mb-3" style="font-size: 0.80rem;">
+                        <span><i class="fas fa-arrow-down text-primary me-1"></i>Min pH: <strong>{{ r.min_ph }}</strong></span>
+                        <span><i class="fas fa-arrow-up text-danger me-1"></i>Max pH: <strong>{{ r.max_ph }}</strong></span>
+                    </div>
+                </div>
+                
+                <div class="row g-2">
+                    <div class="col-8">
+                        <a href="{% url 'monitoring_rak' r.id %}" class="btn btn-success w-100 py-2 font-semibold" style="font-size: 0.85rem;">
+                            <i class="fas fa-chart-line me-1"></i> Grafik
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-success w-100 py-2 font-semibold" style="font-size: 0.85rem;" data-bs-toggle="modal" data-bs-target="#modalEditRak-{{ r.id }}" title="Edit Parameter">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Edit Rak -->
+        <div class="modal fade" id="modalEditRak-{{ r.id }}" tabindex="-1" aria-labelledby="modalEditRakLabel-{{ r.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <form method="POST" action="{% url 'edit_rak' r.id %}" enctype="multipart/form-data" class="modal-content">
+                    {% csrf_token %}
+                    <div class="modal-header py-3">
+                        <h5 class="modal-title fw-bold text-dark-green" id="modalEditRakLabel-{{ r.id }}"><i class="fas fa-cog text-success me-2"></i>Edit Pengaturan Rak</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 text-start">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-success" style="font-size: 0.9rem;">Nama Rak</label>
+                            <input type="text" name="nama_rak" class="form-control form-control-custom" value="{{ r.nama_rak }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-success" style="font-size: 0.9rem;">API Key</label>
+                            <input type="text" name="api_key" class="form-control form-control-custom" value="{{ r.api_key.api_key }}" required>
+                            <div class="form-text text-muted">API Key harus terdaftar pada data admin.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-success" style="font-size: 0.9rem;">Nomor WhatsApp Notifikasi</label>
+                            <input type="text" name="nomor_wa" class="form-control form-control-custom" value="{{ r.nomor_wa }}" required>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-success" style="font-size: 0.9rem;">Min pH</label>
+                                <input type="number" name="min_ph" step="0.1" class="form-control form-control-custom" value="{{ r.min_ph }}" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-success" style="font-size: 0.9rem;">Maks pH</label>
+                                <input type="number" name="max_ph" step="0.1" class="form-control form-control-custom" value="{{ r.max_ph }}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-success" style="font-size: 0.9rem;">Ganti Foto Rak (Opsional)</label>
+                            <input type="file" name="foto" class="form-control form-control-custom" accept="image/*">
+                            <div class="form-text text-muted">Biarkan kosong untuk menggunakan foto saat ini.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer px-4 py-3">
+                        <button type="button" class="btn btn-light px-3" data-bs-dismiss="modal" style="border-radius: 0.75rem; font-weight: 600;">Batal</button>
+                        <button type="submit" class="btn btn-success px-4">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Add Rack Card -->
+    <div class="col-6 col-sm-6 col-lg-4 mb-4">
+        <div class="card h-100 border-dashed-green">
+            <div class="card-body p-0">
+                <button type="button" class="btn btn-add-rak" data-bs-toggle="modal" data-bs-target="#modalRak">
+                    <i class="fas fa-plus"></i>
+                    <span class="fw-bold">Tambah Rak Baru</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Rak -->
+<div class="modal fade" id="modalRak" tabindex="-1" aria-labelledby="modalRakLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="POST" enctype="multipart/form-data" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header py-3">
+                <h5 class="modal-title fw-bold text-dark-green" id="modalRakLabel"><i class="fas fa-plus-circle text-success me-2"></i>Tambah Rak Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-success" style="font-size: 0.9rem;">Nama Rak</label>
+                    <input type="text" name="nama_rak" class="form-control form-control-custom" placeholder="Contoh: Rak Selada A1" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-success" style="font-size: 0.9rem;">API Key</label>
+                    <input type="text" name="api_key" class="form-control form-control-custom" placeholder="Masukkan API Key yang terdaftar" required>
+                    <div class="form-text text-muted">API Key harus terdaftar pada data admin.</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-success" style="font-size: 0.9rem;">Nomor WhatsApp Notifikasi</label>
+                    <input type="text" name="nomor_wa" class="form-control form-control-custom" placeholder="Contoh: 628123456789" required>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-bold text-success" style="font-size: 0.9rem;">Min pH</label>
+                        <input type="number" name="min_ph" step="0.1" class="form-control form-control-custom" placeholder="Contoh: 5.5" value="5.5" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-bold text-success" style="font-size: 0.9rem;">Maks pH</label>
+                        <input type="number" name="max_ph" step="0.1" class="form-control form-control-custom" placeholder="Contoh: 6.5" value="6.5" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-success" style="font-size: 0.9rem;">Foto Rak (Opsional)</label>
+                    <input type="file" name="foto" class="form-control form-control-custom" accept="image/*">
+                    <div class="form-text text-muted">Akan dikonversi otomatis ke WebP. Maksimal 5MB.</div>
+                    <div id="previewContainer" class="mt-3 text-center" style="display:none; border-radius: 0.75rem; overflow: hidden; max-height: 200px; background: #f4f7f6; padding: 10px;">
+                        <img id="previewImage" src="" alt="Preview" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer px-4 py-3">
+                <button type="button" class="btn btn-light px-3" data-bs-dismiss="modal" style="border-radius: 0.75rem; font-weight: 600;">Batal</button>
+                <button type="submit" class="btn btn-success px-4">Simpan Rak</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Handle Deep Sleep Selector Changes via AJAX
+document.querySelectorAll('.deepsleep-select').forEach(select => {
+    let previousValue = select.value;
+    
+    select.addEventListener('focus', function() {
+        previousValue = this.value;
+    });
+
+    select.addEventListener('change', function(e) {
+        const rakId = this.dataset.rakId;
+        const minutes = this.value;
+        
+        fetch(`/rak/${rakId}/deepsleep/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+            },
+            body: `menit=${minutes}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Show floating success toast
+                const toast = document.createElement('div');
+                toast.className = 'alert alert-success alert-dismissible fade show shadow';
+                toast.style.position = 'fixed';
+                toast.style.bottom = '20px';
+                toast.style.right = '20px';
+                toast.style.zIndex = '9999';
+                toast.style.borderRadius = '0.75rem';
+                toast.innerHTML = `
+                    <i class="fas fa-check-circle me-2"></i> ${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" style="padding: 1rem 1rem 1rem 0.5rem;"></button>
+                `;
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 500);
+                }, 3000);
+                previousValue = minutes;
+            } else {
+                alert('Gagal memperbarui Deep Sleep: ' + data.message);
+                this.value = previousValue;
+            }
+        })
+        .catch(error => {
+            alert('Error updating deep sleep: ' + error);
+            this.value = previousValue;
+        });
+    });
+});
+
+// Photo Preview
+document.querySelector('input[name="foto"]')?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            document.getElementById('previewImage').src = event.target.result;
+            document.getElementById('previewContainer').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        document.getElementById('previewContainer').style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

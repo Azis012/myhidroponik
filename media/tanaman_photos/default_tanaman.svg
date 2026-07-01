@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <rect width="800" height="450" fill="#e9ecef" />
+  <rect x="50" y="70" width="700" height="310" rx="20" fill="#ffffff" stroke="#ced4da" stroke-width="4" />
+  <text x="400" y="220" font-family="Arial, sans-serif" font-size="36" fill="#6c757d" text-anchor="middle">Foto Tanaman Tidak Tersedia</text>
+  <text x="400" y="270" font-family="Arial, sans-serif" font-size="20" fill="#adb5bd" text-anchor="middle">Tambahkan gambar untuk tampilan lebih menarik</text>
+</svg>

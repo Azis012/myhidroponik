@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    .dashboard-banner {
+        background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 50%, #40916c 100%);
+        border-radius: 1.5rem;
+        box-shadow: 0 12px 35px rgba(27, 67, 50, 0.18);
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .banner-icon {
+        position: absolute;
+        right: -10px;
+        bottom: -20px;
+        font-size: 9rem;
+        color: rgba(255, 255, 255, 0.07);
+        transform: rotate(15deg);
+        pointer-events: none;
+    }
+    .banner-badge {
+        background: #ffffff !important;
+        color: #1b4332 !important;
+        font-weight: 700 !important;
+        letter-spacing: 1.2px;
+        font-size: 0.75rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+    .icon-badge {
+        width: 80px;
+        height: 80px;
+        background: rgba(40, 145, 108, 0.1);
+        color: #2d6a4f;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0.5rem auto 1.5rem auto;
+        font-size: 2.25rem;
+        box-shadow: inset 0 2px 4px rgba(40, 145, 108, 0.05);
+        transition: all 0.3s ease;
+    }
+    .card-hover:hover .icon-badge {
+        transform: rotate(12deg) scale(1.05);
+        background: rgba(40, 145, 108, 0.18);
+        color: #1b4332;
+    }
+    .btn-delete-kebun {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: rgba(220, 53, 69, 0.08);
+        color: #dc3545;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    .btn-delete-kebun:hover {
+        background: #dc3545;
+        color: #ffffff;
+        transform: scale(1.05);
+    }
+    .btn-add-kebun {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        min-height: 220px;
+        border: none;
+        background: transparent;
+        color: #2d6a4f;
+        transition: all 0.2s;
+    }
+    .btn-add-kebun i {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+        background: rgba(40, 145, 108, 0.1);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+    }
+    .btn-add-kebun:hover i {
+        transform: scale(1.1);
+        background: #2d6a4f;
+        color: #ffffff;
+    }
+    
+    /* Modern modal customizations */
+    .modal-content {
+        border-radius: 1.25rem;
+        border: none;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+    .modal-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background-color: #f4f7f6;
+    }
+    .modal-footer {
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .form-control-custom {
+        border: 2px solid #d8f3dc;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s;
+    }
+    .form-control-custom:focus {
+        border-color: #52b788;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(82, 183, 136, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Welcome Banner -->
+<div class="dashboard-banner mb-5 p-4 p-md-5">
+    <div class="position-relative z-index-2" style="max-width: 600px;">
+        <span class="badge banner-badge px-3 py-2 rounded-pill mb-3">DASHBOARD</span>
+        <h1 class="fw-bold mb-3" style="font-size: 2.25rem;">Selamat Datang, {{ user.username }}! 🌱</h1>
+        <p class="lead mb-0 opacity-80" style="font-size: 1.05rem; line-height: 1.6;">
+            Kelola dan pantau semua data sensor kebun hidroponik Anda dari jarak jauh secara real-time.
+        </p>
+    </div>
+    <i class="fas fa-seedling banner-icon"></i>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-dark-green"><i class="fas fa-leaf text-success me-2"></i>Daftar Kebun Anda</h3>
+</div>
+
+<div class="row">
+    {% for k in kebuns %}
+    <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
+        <div class="card h-100 shadow-sm card-hover border-0 position-relative">
+            <!-- Sleek Absolute Delete Button -->
+            <a href="{% url 'hapus' 'kebun' k.id %}" class="btn-delete-kebun" onclick="return confirm('Apakah Anda yakin ingin menghapus kebun {{ k.nama }} beserta seluruh rak di dalamnya?')" title="Hapus Kebun">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+            
+            <div class="card-body d-flex flex-column justify-content-between p-2 p-md-4 text-center">
+                <div>
+                    <!-- Leaf Icon Badge -->
+                    <div class="icon-badge">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark-green mb-2" style="font-size: 1rem;">{{ k.nama }}</h5>
+                    <p class="text-muted small mb-4">
+                        <i class="far fa-calendar-alt me-1"></i> Dibuat: {{ k.created_at|date:"d M Y" }}
+                    </p>
+                </div>
+                
+                <div class="d-grid">
+                    <a href="{% url 'daftar_tanaman' k.id %}" class="btn btn-success py-2 font-semibold" style="font-size: 0.9rem;">
+                        Buka Kebun <i class="fas fa-arrow-right ms-2 small"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Add Garden Card -->
+    <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
+        <div class="card h-100 border-dashed-green">
+            <div class="card-body p-0">
+                <button class="btn btn-add-kebun" data-bs-toggle="modal" data-bs-target="#modalTambah" style="min-height: 180px;">
+                    <i class="fas fa-plus"></i>
+                    <span class="fw-bold" style="font-size: 0.9rem;">Tambah Kebun Baru</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Kebun -->
+<div class="modal fade" id="modalTambah" tabindex="-1" aria-labelledby="modalTambahLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="POST" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header py-3">
+                <h5 class="modal-title fw-bold text-dark-green" id="modalTambahLabel"><i class="fas fa-plus-circle text-success me-2"></i>Tambah Kebun Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-success" style="font-size: 0.9rem;">Nama Kebun</label>
+                    <input type="text" name="nama_kebun" class="form-control form-control-custom" placeholder="Nama Kebun (Contoh: Kebun Hidroponik Belakang)" required autofocus>
+                    <div class="form-text text-muted">Beri nama kebun yang deskriptif untuk mempermudah pemantauan.</div>
+                </div>
+            </div>
+            <div class="modal-footer px-4 py-3">
+                <button type="button" class="btn btn-light px-3" data-bs-dismiss="modal" style="border-radius: 0.75rem; font-weight: 600;">Batal</button>
+                <button type="submit" class="btn btn-success px-4">Simpan Kebun</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        border-radius: 1.5rem;
+        padding: 3rem 2rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 10px 30px rgba(40, 145, 108, 0.08);
+    }
+    
+    .carousel-item-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 350px;
+    }
+    
+    .carousel-text {
+        max-width: 50%;
+        text-align: left;
+    }
+    
+    .carousel-image {
+        max-width: 45%;
+        text-align: center;
+    }
+    .carousel-image img {
+        width: 100%;
+        max-width: 320px;
+        height: auto;
+        max-height: 250px;
+        object-fit: cover;
+        border-radius: 1.25rem;
+        box-shadow: 0 10px 25px rgba(27, 67, 50, 0.12);
+        border: 4px solid #ffffff;
+        transition: all 0.3s ease;
+    }
+    .carousel-image img:hover {
+        transform: scale(1.03) rotate(1deg);
+    }
+    
+    .feature-card {
+        border-radius: 1.25rem;
+        border: none;
+        background: #ffffff;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03);
+        transition: all 0.3s;
+        text-align: center;
+        padding: 2.25rem 1.5rem;
+        height: 100%;
+    }
+    .feature-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(40, 145, 108, 0.1);
+    }
+    
+    .feature-icon-badge {
+        width: 70px;
+        height: 70px;
+        background: rgba(40, 145, 108, 0.08);
+        color: #2d6a4f;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.25rem auto;
+        font-size: 1.75rem;
+        box-shadow: inset 0 2px 4px rgba(40, 145, 108, 0.05);
+    }
+    
+    @media (max-width: 767.98px) {
+        .carousel-item-content {
+            flex-direction: column;
+            text-align: center;
+            min-height: auto;
+        }
+        .carousel-text {
+            max-width: 100%;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .carousel-image {
+            max-width: 100%;
+        }
+        .carousel-image i {
+            font-size: 5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Carousel Section -->
+<div class="hero-section text-center position-relative">
+    <div id="landingCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators" style="bottom: -20px;">
+            <button type="button" data-bs-target="#landingCarousel" data-bs-slide-to="0" class="active" aria-current="true" style="background-color: #2d6a4f;"></button>
+            <button type="button" data-bs-target="#landingCarousel" data-bs-slide-to="1" style="background-color: #2d6a4f;"></button>
+            <button type="button" data-bs-target="#landingCarousel" data-bs-slide-to="2" style="background-color: #2d6a4f;"></button>
+        </div>
+        
+        <div class="carousel-inner">
+            <!-- Slide 1 -->
+            <div class="carousel-item active" data-bs-interval="4000">
+                <div class="carousel-item-content py-3">
+                    <div class="carousel-text">
+                        <span class="badge bg-success px-3 py-2 rounded-pill mb-3 font-semibold">SMART IoT</span>
+                        <h1 class="fw-bold text-dark-green mb-3" style="font-size: 2.25rem;">Monitor Kebun Hidroponik Real-time</h1>
+                        <p class="text-muted mb-4 lead" style="font-size: 1rem;">Pantau parameter penting air seperti pH, TDS, dan Suhu air secara akurat dari mana saja dan kapan saja.</p>
+                        <a href="{% url 'register' %}" class="btn btn-success px-4 py-2 font-semibold me-2">Mulai Sekarang</a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-success px-4 py-2 font-semibold">Masuk</a>
+                    </div>
+                    <div class="carousel-image">
+                        <img src="/media/landing_banners/lettuce.png" alt="Monitor Kebun Hidroponik Real-time">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 2 -->
+            <div class="carousel-item" data-bs-interval="4000">
+                <div class="carousel-item-content py-3">
+                    <div class="carousel-text">
+                        <span class="badge bg-success px-3 py-2 rounded-pill mb-3 font-semibold">WHATSAPP NOTIFICATION</span>
+                        <h1 class="fw-bold text-dark-green mb-3" style="font-size: 2.25rem;">Notifikasi Bahaya Instan</h1>
+                        <p class="text-muted mb-4 lead" style="font-size: 1rem;">Dapatkan alarm otomatis ke WhatsApp Anda jika nilai pH atau TDS tanaman Anda berada di luar batas aman.</p>
+                        <a href="{% url 'register' %}" class="btn btn-success px-4 py-2 font-semibold me-2">Daftar Akun</a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-success px-4 py-2 font-semibold">Masuk</a>
+                    </div>
+                    <div class="carousel-image">
+                        <img src="/media/landing_banners/whatsapp.png" alt="Notifikasi Bahaya Instan WhatsApp">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 3 -->
+            <div class="carousel-item" data-bs-interval="4000">
+                <div class="carousel-item-content py-3">
+                    <div class="carousel-text">
+                        <span class="badge bg-success px-3 py-2 rounded-pill mb-3 font-semibold">HYDRO AI</span>
+                        <h1 class="fw-bold text-dark-green mb-3" style="font-size: 2.25rem;">Asisten AI Ahli Hidroponik</h1>
+                        <p class="text-muted mb-4 lead" style="font-size: 1rem;">Konsultasikan kendala pertumbuhan, parameter nutrisi, dan tips perawatan hidroponik dengan AI chatbot cerdas kami.</p>
+                        <a href="{% url 'register' %}" class="btn btn-success px-4 py-2 font-semibold me-2">Coba Sekarang</a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-success px-4 py-2 font-semibold">Masuk</a>
+                    </div>
+                    <div class="carousel-image">
+                        <img src="/media/landing_banners/sensor.png" alt="Hydro AI Smart Assistant">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#landingCarousel" data-bs-slide="prev" style="width: 5%;">
+            <span class="carousel-control-prev-icon bg-dark p-2 rounded-circle" aria-hidden="true" style="width: 2.25rem; height: 2.25rem;"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#landingCarousel" data-bs-slide="next" style="width: 5%;">
+            <span class="carousel-control-next-icon bg-dark p-2 rounded-circle" aria-hidden="true" style="width: 2.25rem; height: 2.25rem;"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+
+<!-- Deskripsi Aplikasi Section -->
+<div class="row my-5 align-items-center">
+    <div class="col-md-6 mb-4 mb-md-0">
+        <h2 class="fw-bold text-dark-green mb-3">Apa itu Smart Hidroponik?</h2>
+        <p class="text-muted" style="line-height: 1.7; font-size: 1.05rem;">
+            Smart Hidroponik adalah sistem pemantauan berbasis IoT (*Internet of Things*) yang didesain khusus untuk membantu petani modern mengelola kebun hidroponik mereka secara optimal.
+        </p>
+        <p class="text-muted" style="line-height: 1.7; font-size: 1.05rem;">
+            Melalui integrasi sensor perangkat keras (ESP32) dan komputasi awan, seluruh data kondisi air tanaman dikirimkan langsung ke dashboard web ini. Anda tidak perlu lagi melakukan pengecekan air secara manual setiap hari.
+        </p>
+    </div>
+    <div class="col-md-6 text-center">
+        <img src="/media/landing_banners/lettuce.png" class="img-fluid" alt="Smart Hidroponik System" style="border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); max-height: 280px; width: 100%; object-fit: cover; border: 4px solid #ffffff;">
+    </div>
+</div>
+
+<!-- Keunggulan Aplikasi Section -->
+<div class="my-5 text-center">
+    <h2 class="fw-bold text-dark-green mb-2">Mengapa Memilih Kami?</h2>
+    <p class="text-muted mb-5">Keunggulan fitur Smart Hidroponik dibanding pemantauan manual</p>
+    
+    <div class="row g-4">
+        <!-- Feature 1 -->
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="feature-card">
+                <div class="feature-icon-badge">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h5 class="fw-bold text-dark-green mb-2">Dashboard Grafik</h5>
+                <p class="text-muted small mb-0">Visualisasi data pH, TDS, dan suhu dalam bentuk grafik garis yang interaktif untuk memantau tren.</p>
+            </div>
+        </div>
+        <!-- Feature 2 -->
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="feature-card">
+                <div class="feature-icon-badge">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h5 class="fw-bold text-dark-green mb-2">WhatsApp Alarm</h5>
+                <p class="text-muted small mb-0">Peringatan otomatis dikirimkan langsung ke nomor WhatsApp Anda saat nutrisi tanaman memburuk.</p>
+            </div>
+        </div>
+        <!-- Feature 3 -->
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="feature-card">
+                <div class="feature-icon-badge">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h5 class="fw-bold text-dark-green mb-2">Hydro AI Chat</h5>
+                <p class="text-muted small mb-0">Asisten AI terlatih yang siap memberikan saran parameter nutrisi dan diagnosa penyakit daun.</p>
+            </div>
+        </div>
+        <!-- Feature 4 -->
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="feature-card">
+                <div class="feature-icon-badge">
+                    <i class="fas fa-microchip"></i>
+                </div>
+                <h5 class="fw-bold text-dark-green mb-2">Sinkronisasi Hemat Daya</h5>
+                <p class="text-muted small mb-0">Mengatur interval tidur (*deep sleep*) modul sensor ESP32 langsung melalui browser Anda.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        min-height: 100vh;
+    }
+    .navbar {
+        background: rgba(25, 135, 84, 0.9) !important;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    }
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 100px);
+        padding: 20px 0;
+    }
+    .auth-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 1.25rem;
+        box-shadow: 0 8px 32px 0 rgba(11, 54, 29, 0.15);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 500px;
+        transition: transform 0.3s ease;
+    }
+    .auth-card:hover {
+        transform: translateY(-2px);
+    }
+    .auth-brand {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .auth-brand i {
+        font-size: 3rem;
+        color: #198754;
+        margin-bottom: 0.5rem;
+        filter: drop-shadow(0 2px 8px rgba(25, 135, 84, 0.3));
+    }
+    .auth-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1b4332;
+        margin-bottom: 0.5rem;
+    }
+    .auth-subtitle {
+        color: #52b788;
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Django form customization */
+    .auth-card form p {
+        margin-bottom: 1.25rem;
+        display: flex;
+        flex-direction: column;
+    }
+    .auth-card form p label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #2d6a4f;
+        margin-bottom: 0.5rem;
+        display: inline-block;
+    }
+    .auth-card form p input {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #1b4332;
+        background-color: #ffffff;
+        border: 2px solid #d8f3dc;
+        border-radius: 0.75rem;
+        transition: all 0.2s ease-in-out;
+    }
+    .auth-card form p input:focus {
+        border-color: #52b788;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(82, 183, 136, 0.25);
+        background-color: #fff;
+    }
+    
+    /* Help text & validation lists */
+    .auth-card form p .helptext {
+        font-size: 0.8rem;
+        color: #40916c;
+        margin-top: 0.4rem;
+        line-height: 1.4;
+        display: block;
+    }
+    .auth-card form p ul {
+        margin-top: 0.25rem;
+        padding-left: 1.2rem;
+        color: #6c757d;
+        font-size: 0.775rem;
+        line-height: 1.4;
+    }
+    .auth-card form p ul li {
+        margin-bottom: 0.2rem;
+    }
+    .auth-card form ul.errorlist {
+        color: #d90429;
+        list-style-type: none;
+        padding-left: 0;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .btn-auth {
+        background: linear-gradient(135deg, #40916c 0%, #1b4332 100%);
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.8rem;
+        font-weight: 600;
+        color: #fff;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(40, 145, 108, 0.3);
+    }
+    .btn-auth:hover {
+        background: linear-gradient(135deg, #52b788 0%, #2d6a4f 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(40, 145, 108, 0.4);
+        color: #fff;
+    }
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.9rem;
+    }
+    .auth-footer a {
+        color: #40916c;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s ease;
+    }
+    .auth-footer a:hover {
+        color: #1b4332;
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-brand">
+            <i class="fas fa-seedling"></i>
+            <h2 class="auth-title">Daftar Akun</h2>
+            <p class="auth-subtitle">Mulai monitoring sistem hidroponik Anda</p>
+        </div>
+        
+        <form method="POST">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <ul class="errorlist">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            
+            {{ form.as_p }}
+            
+            <button type="submit" class="btn btn-auth w-100 mt-2">Daftar</button>
+        </form>
+        
+        <div class="auth-footer text-muted">
+            Sudah punya akun? <a href="{% url 'login' %}">Login di sini</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

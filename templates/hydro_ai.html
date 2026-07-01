@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        max-width: 750px;
+        margin: 0 auto;
+    }
+    .chat-card {
+        border-radius: 1.25rem;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
+        height: 500px;
+        display: flex;
+        flex-direction: column;
+    }
+    .chat-header {
+        background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
+        color: #ffffff;
+        padding: 1.25rem 1.5rem;
+        border-top-left-radius: 1.25rem;
+        border-top-right-radius: 1.25rem;
+        display: flex;
+        align-items: center;
+    }
+    .chat-header-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        margin-right: 0.75rem;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.15);
+    }
+    
+    .chat-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .chat-bubble {
+        max-width: 75%;
+        padding: 0.85rem 1.1rem;
+        border-radius: 1rem;
+        line-height: 1.5;
+        font-size: 0.95rem;
+    }
+    
+    .bubble-bot {
+        background-color: #f4f7f6;
+        color: #1b4332;
+        align-self: flex-start;
+        border-top-left-radius: 0.25rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+    
+    .bubble-user {
+        background: linear-gradient(135deg, #40916c 0%, #2d6a4f 100%);
+        color: #ffffff;
+        align-self: flex-end;
+        border-top-right-radius: 0.25rem;
+        box-shadow: 0 4px 10px rgba(40, 145, 108, 0.15);
+    }
+    
+    .chat-footer {
+        padding: 1.25rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        background: #ffffff;
+        border-bottom-left-radius: 1.25rem;
+        border-bottom-right-radius: 1.25rem;
+    }
+    
+    .quick-sug {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+    .btn-sug {
+        font-size: 0.8rem;
+        border-radius: 20px;
+        border: 1px solid #d8f3dc;
+        background: #ffffff;
+        color: #2d6a4f;
+        padding: 0.35rem 0.85rem;
+        transition: all 0.2s;
+        font-weight: 500;
+    }
+    .btn-sug:hover {
+        background: #2d6a4f;
+        color: #ffffff;
+        border-color: #2d6a4f;
+    }
+    
+    .chat-input-group {
+        display: flex;
+        gap: 0.75rem;
+    }
+    
+    .chat-input {
+        flex: 1;
+        border: 2px solid #d8f3dc;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    .chat-input:focus {
+        border-color: #52b788;
+    }
+    
+    .btn-send {
+        background: #2d6a4f;
+        color: #ffffff;
+        border: none;
+        border-radius: 0.75rem;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(45, 106, 79, 0.2);
+    }
+    .btn-send:hover {
+        background: #1b4332;
+        transform: scale(1.03);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-card">
+        <!-- Header -->
+        <div class="chat-header">
+            <img src="/media/hydro_ai_avatar.png" class="chat-header-avatar" alt="Hydro AI Avatar">
+            <div>
+                <h5 class="fw-bold mb-0">Hydro AI</h5>
+                <small class="text-success-light" style="color: #d8f3dc; font-size: 0.75rem;">
+                    <i class="fas fa-circle me-1 fa-xs" style="color: #52b788;"></i> Aktif & Siap Membantu
+                </small>
+            </div>
+        </div>
+        
+        <!-- Chat Area -->
+        <div class="chat-body" id="chatBody">
+            <div class="chat-bubble bubble-bot">
+                Halo! Saya <strong>Hydro AI</strong>, asisten ahli hidroponik Anda. Tanyakan apa saja tentang parameter air (pH, TDS/PPM), suhu, tanaman layu, atau kebutuhan kit sensor Anda!
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="chat-footer">
+            <!-- Quick Suggestions -->
+            <div class="quick-sug">
+                <button class="btn-sug" onclick="sendSuggestion('Berapa nilai pH air ideal?')">Berapa pH ideal?</button>
+                <button class="btn-sug" onclick="sendSuggestion('Berapa TDS/PPM nutrisi selada?')">Berapa PPM selada?</button>
+                <button class="btn-sug" onclick="sendSuggestion('Mengapa daun tanaman saya kuning?')">Daun kuning kenapa?</button>
+                <button class="btn-sug" onclick="sendSuggestion('Berapa suhu air hidroponik ideal?')">Berapa suhu air ideal?</button>
+            </div>
+            
+            <!-- Message Input Form -->
+            <form id="chatForm" class="chat-input-group">
+                {% csrf_token %}
+                <input type="text" id="userInput" class="chat-input" placeholder="Tulis pertanyaan Anda di sini..." required autocomplete="off">
+                <button type="submit" class="btn-send"><i class="fas fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const chatBody = document.getElementById('chatBody');
+    const chatForm = document.getElementById('chatForm');
+    const userInput = document.getElementById('userInput');
+
+    function formatMarkdown(text) {
+        let html = text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+        // Bold: **text** -> <strong>text</strong>
+        html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+        // Italic/List items that are not bold: *text* -> <em>text</em>
+        // If it starts with space/newline and * followed by space, we make it bullet point
+        html = html.replace(/^\s*[\*\-]\s+(.+)$/gm, '&bull; $1');
+        html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+        // Line breaks: \n -> <br>
+        html = html.replace(/\n/g, '<br>');
+
+        return html;
+    }
+
+    function appendMessage(text, isUser) {
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble ${isUser ? 'bubble-user' : 'bubble-bot'}`;
+        bubble.innerHTML = formatMarkdown(text);
+        chatBody.appendChild(bubble);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function sendSuggestion(text) {
+        userInput.value = text;
+        chatForm.requestSubmit();
+    }
+
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const text = userInput.value.trim();
+        if (!text) return;
+        
+        // Append user message
+        appendMessage(text, true);
+        userInput.value = '';
+        
+        // Show typing indicator
+        const typingBubble = document.createElement('div');
+        typingBubble.className = 'chat-bubble bubble-bot typing-indicator';
+        typingBubble.innerHTML = '<i class="fas fa-ellipsis-h fa-spin"></i> Hydro AI sedang berpikir...';
+        chatBody.appendChild(typingBubble);
+        chatBody.scrollTop = chatBody.scrollHeight;
+        
+        // POST to AJAX view
+        fetch('{% url "hydro_ai" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: `message=${encodeURIComponent(text)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            typingBubble.remove();
+            appendMessage(data.response, false);
+        })
+        .catch(error => {
+            typingBubble.remove();
+            appendMessage("Maaf, terjadi kesalahan jaringan. Silakan coba lagi.", false);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+# Django
+*.pyc
+__pycache__/
+db.sqlite3
+.env
+media/rak_photos/*.webp
+media/tanaman_photos/*.webp
+*.log
+
+# Node
+node_modules/
+whatsapp_gateway/node_modules/
+whatsapp_gateway/auth_info_baileys/
+whatsapp_gateway/auth_info_baileys*
+.DS_Store
+.idea/
+.vscode/
