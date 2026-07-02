@@ -108,9 +108,6 @@
                         <a class="nav-link {% if request.resolver_match.url_name == 'daftar_kebun' %}active{% endif %}" href="{% url 'daftar_kebun' %}"><i class="fas fa-home me-1"></i> Dashboard</a>
                         <a class="nav-link {% if request.resolver_match.url_name == 'hydro_ai' %}active{% endif %}" href="{% url 'hydro_ai' %}"><i class="fas fa-robot me-1 text-success"></i> Hydro AI</a>
                         <a class="nav-link {% if request.resolver_match.url_name == 'beli_kit' %}active{% endif %}" href="{% url 'beli_kit' %}"><i class="fas fa-shopping-bag me-1 text-warning"></i> Beli Alat Kit</a>
-                        {% if user.is_superuser %}
-                            <a class="nav-link" href="/admin/" target="_blank"><i class="fas fa-user-shield me-1 text-warning"></i> Panel Admin</a>
-                        {% endif %}
                     {% endif %}
                 </div>
                 <div class="navbar-nav ms-auto align-items-center">
