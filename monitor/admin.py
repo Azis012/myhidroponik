@@ -3,9 +3,18 @@ from .models import APIKey, Kebun, Tanaman, Rak, DataSensor
 
 @admin.register(APIKey)
 class APIKeyAdmin(admin.ModelAdmin):
-    list_display = ('api_key', 'nama_alat', 'status', 'created_at')
+    list_display = ('api_key', 'nama_alat', 'get_connected_user', 'status', 'created_at')
     list_filter = ('status', 'created_at')
     search_fields = ('api_key', 'nama_alat')
+
+    def get_connected_user(self, obj):
+        raks = obj.rak_set.all()
+        users = set()
+        for r in raks:
+            if r.tanaman and r.tanaman.kebun and r.tanaman.kebun.user:
+                users.add(r.tanaman.kebun.user.username)
+        return ", ".join(users) if users else "-"
+    get_connected_user.short_description = "Terhubung ke User"
 
 @admin.register(Kebun)
 class KebunAdmin(admin.ModelAdmin):
@@ -40,8 +49,14 @@ class RakAdmin(admin.ModelAdmin):
 
 @admin.register(DataSensor)
 class DataSensorAdmin(admin.ModelAdmin):
-    list_display = ('rak', 'ph', 'tds', 'suhu', 'timestamp')
-    list_filter = ('rak', 'timestamp')
-    search_fields = ('rak__nama_rak',)
+    list_display = ('rak', 'get_user', 'ph', 'tds', 'suhu', 'timestamp')
+    list_filter = ('rak__tanaman__kebun__user', 'rak', 'timestamp')
+    search_fields = ('rak__nama_rak', 'rak__tanaman__kebun__user__username')
     readonly_fields = ('timestamp',)
     ordering = ('-timestamp',)
+
+    def get_user(self, obj):
+        if obj.rak and obj.rak.tanaman and obj.rak.tanaman.kebun and obj.rak.tanaman.kebun.user:
+            return obj.rak.tanaman.kebun.user.username
+        return "-"
+    get_user.short_description = "User Pemilik"
