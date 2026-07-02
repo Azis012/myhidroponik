@@ -21,16 +21,16 @@ class TanamanAdmin(admin.ModelAdmin):
 
 @admin.register(Rak)
 class RakAdmin(admin.ModelAdmin):
-    list_display = ('nama_rak', 'tanaman', 'api_key', 'deepsleep_menit', 'nomor_wa', 'created_at')
+    list_display = ('nama_rak', 'tanaman', 'api_key', 'min_ph', 'max_ph', 'deepsleep_menit', 'nomor_wa', 'created_at')
     list_filter = ('tanaman__kebun', 'tanaman', 'deepsleep_menit', 'created_at')
     search_fields = ('nama_rak', 'api_key__api_key', 'nomor_wa')
-    readonly_fields = ('created_at',)
+    readonly_fields = ('created_at', 'last_notification_sent')
     fieldsets = (
         ('Info Rak', {
             'fields': ('tanaman', 'nama_rak', 'api_key', 'nomor_wa', 'foto')
         }),
-        ('Konfigurasi', {
-            'fields': ('deepsleep_menit',)
+        ('Konfigurasi EWS & Daya', {
+            'fields': ('deepsleep_menit', 'min_ph', 'max_ph', 'last_notification_sent')
         }),
         ('Metadata', {
             'fields': ('created_at',),
