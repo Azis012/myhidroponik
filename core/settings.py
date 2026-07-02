@@ -47,6 +47,7 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -172,5 +173,73 @@ import os
 # Google Gemini API Key configuration
 # Anda bisa mengisi langsung di sini atau menggunakan environment variable
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', 'AIzaSyCvljIsIxsnZO4xT5jSihoYu1FIhGsvYzM')
+
+# Jazzmin Admin Panel Configuration
+JAZZMIN_SETTINGS = {
+    "site_title": "Smart Hidroponik Admin",
+    "site_header": "Smart Hidroponik",
+    "site_brand": "Hidroponik Admin",
+    "welcome_sign": "Selamat datang di Panel Admin Smart Hidroponik",
+    "copyright": "Smart Hidroponik EWS IoT Ltd",
+    "search_model": ["monitor.Rak", "monitor.APIKey"],
+    "user_avatar": None,
+    "topmenu_links": [
+        {"name": "Home Website", "url": "daftar_kebun", "permissions": ["auth.view_user"]},
+        {"model": "monitor.Rak"},
+        {"model": "monitor.APIKey"},
+    ],
+    "usermenu_links": [
+        {"name": "Home Website", "url": "daftar_kebun", "new_window": False},
+    ],
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "order_with_respect_to": ["monitor", "auth"],
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "monitor.APIKey": "fas fa-key",
+        "monitor.Kebun": "fas fa-leaf",
+        "monitor.Tanaman": "fas fa-seedling",
+        "monitor.Rak": "fas fa-th-large",
+        "monitor.DataSensor": "fas fa-chart-line",
+    },
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-success",
+    "accent": "accent-success",
+    "navbar": "navbar-success navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_options": {
+        "dark_mode_theme": None,
+        "fixed_layout": False,
+    },
+    "sidebar": "sidebar-dark-success",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "flatly",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-success",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
+}
+
 
 
